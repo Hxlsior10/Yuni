@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <script>
+        // Script pour le header sticky
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.querySelector('header');
+            
+            // Appliquer le style dès le chargement si la page est déjà défillée
+            if (window.scrollY > 0) {
+                header.classList.add('scrolled');
+            }
+            
+            // Ajouter un écouteur d'événement de défilement
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 0) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+        });
+        </script>
+        
+    <!-- Ajouter les scripts Firebase -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+
+    console.log("📡 Firebase modules importés !");
+</script>
+
+<!-- Popup de remerciement - Corrigé -->
+<div id="thank-you-popup" class="popup" style="display: none;">
+    <div class="popup-content">
+        <p>Merci ! Votre email a bien été enregistré.</p>
+        <button class="close-popup">Fermer</button>
+    </div>
+</div>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yuni App - Partagez vos moments</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables et reset */
+        :root {
+            --primary: #5a189a;           /* Violet moyen-foncé - couleur principale */
+            --secondary: #7b2cbf;         /* Violet moyen vif - couleur secondaire */
+            --dark: #240046;              /* Violet très foncé - couleur sombre */
+            --medium: #3c096c;            /* Violet foncé - couleur moyenne */
+            --white: #ffffff;
+            --glass-bg: rgba(90, 24, 154, 0.15);
+            --glass-border: rgba(123, 44, 191, 0.18);
+            --glass-shadow: 0 8px 32px 0 rgba(36, 0, 70, 0.37);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, rgba(123, 44, 191, 0.1) 0%, var(--white) 100%);
+            background-attachment: fixed;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Effet de bulle en arrière-plan */
+        .bg-bubbles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(60, 9, 108, 0.1);
+            animation: float 8s infinite ease-in-out;
+        }
+
+        .bubble:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            left: 10%;
+            animation-duration: 8s;
+        }
+
+        .bubble:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            right: 15%;
+            top: 40%;
+            animation-duration: 9s;
+            animation-delay: 1s;
+        }
+
+        .bubble:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            left: 25%;
+            top: 50%;
+            animation-duration: 12s;
+            animation-delay: 2s;
+        }
+
+        .bubble:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            right: 30%;
+            top: 20%;
+            animation-duration: 10s;
+            animation-delay: 3s;
+        }
+
+        .bubble:nth-child(5) {
+            width: 65px;
+            height: 65px;
+            left: 50%;
+            top: 70%;
+            animation-duration: 9s;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            50% {
+                transform: translateY(-20px) translateX(10px);
+            }
+        }
+
+        /* Effet glassmorphisme */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Container et sections */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        section {
+            padding: 70px 0;
+        }
+
+        /* Header - MODIFICATIONS APPORTÉES ICI */
+        header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 20px 0;
+    transition: all 0.3s ease;
+    /* Le header est transparent par défaut */
+    background: transparent;
+}
+        header.scrolled {
+    background: rgba(255, 255, 255, 1); /* Blanc opaque */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 5px 0;
+        }
+        
+        header.scrolled .logo img {
+            max-height: 50px;
+        }
+        
+        header.scrolled .logo {
+            font-size: 24px;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .logo img {
+            max-height: 80px;
+            width: auto;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--medium);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        /* Menu mobile */
+        .mobile-menu-btn {
+            display: none;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--medium);
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 100px;
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+        }
+        
+        .hero-text {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            margin: 0 auto;
+        }
+        
+        .app-title {
+            font-size: 7rem;
+            font-weight: 900;
+            color: var(--dark);
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 6px rgba(36, 0, 70, 0.3);
+            text-align: center;
+            line-height: 1;
+            display: block;
+            width: 100%;
+        }
+        
+        .hero-subtitle {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+            line-height: 1.3;
+            text-align: center;
+        }
+        
+        .hero-text p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #444;
+            text-align: center;
+        }
+        
+        /* Email Signup Styles */
+        .email-signup {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+            gap: 10px;
+        }
+
+        .email-signup input {
+            flex: 1;
+            padding: 15px 20px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .hero-email {
+            margin-top: 20px;
+            background: rgba(123, 44, 191, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(36, 0, 70, 0.2);
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(90, 24, 154, 0.4);
+            font-size: 1.1rem;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(123, 44, 191, 0.6);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Content Sections */
+        .content-section {
+            padding: 60px 0;
+        }
+        
+        .content-box {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            padding: 40px;
+            border-radius: 15px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+        
+        .content-box.reverse {
+            flex-direction: row-reverse;
+        }
+        
+        .content-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .content-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(36, 0, 70, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .content-text {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .content-title {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .content-text p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        /* Features Section */
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--medium);
+            margin-bottom: 60px;
+        }
+
+        .features-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .feature-card {
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            color: var(--medium);
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* How it Works Section */
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            padding: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .steps-container::before {
+            content: '';
+            position: absolute;
+            top: 45px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--light-blue);
+            z-index: -1;
+        }
+
+        .step {
+            text-align: center;
+            width: 22%;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 15px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            position: relative;
+        }
+
+        .step h3 {
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+        }
+
+        .step p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .step-image {
+            margin-top: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(36, 0, 70, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .step-image:hover {
+            transform: scale(1.05);
+        }
+
+        /* CTA Section */
+        .cta {
+            text-align: center;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 80px 20px;
+            margin-top: 50px;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .cta p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .footer-logo img {
+            max-height: 60px;
+            width: auto;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--secondary);
+            color: var(--white);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--dark);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            margin-top: 30px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Styles pour le popup */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .popup-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 80%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .popup p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .close-popup {
+            display: inline-block;
+            padding: 10px 25px;
+            background: var(--primary);
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .close-popup:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .content-box, .content-box.reverse {
+                flex-direction: column;
+                padding: 30px 20px;
+            }
+            
+            .content-image, .content-text {
+                width: 100%;
+            }
+            
+            .content-title {
+                font-size: 1.8rem;
+                text-align: center;
+            }
+            
+            .content-image img {
+                max-width: 80%;
+                margin: 0 auto;
+                display: block;
+            }
+
+            .feature-card {
+                min-width: calc(50% - 30px);
+            }
+            
+            .step {
+                width: 45%;
+            }
+            
+            .app-title {
+                font-size: 5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .steps-container::before {
+                display: none;
+            }
+
+            .email-signup {
+                flex-direction: column;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-links, .social-links {
+                justify-content: center;
+            }
+            
+            .step {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto 30px;
+            }
+            
+            .hero-content {
+                padding: 25px;
+            }
+            
+            .hero-text p {
+                font-size: 1rem;
+            }
+            
+            .beta-announcement {
+                font-size: 1.1rem !important;
+            }
+            
+            .logo {
+                font-size: 24px;
+                gap: 10px;
+            }
+            
+            .logo img {
+                max-height: 50px;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            nav {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.95);
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+            
+            nav.active {
+                max-height: 200px;
+                padding: 15px 0;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-text h1 {
+                font-size: 2.2rem;
+            }
+
+            .feature-card {
+                min-width: 100%;
+            }
+            
+            .beta-announcement {
+                font-size: 1rem !important;
+                padding: 10px !important;
+                display: block !important;
+                width: 100% !important;
+            }
+            
+            .app-title {
+                font-size: 3.5rem !important;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.5rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Bulles d'arrière-plan -->
+    <div class="bg-bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <img src="images/logo poc.png" alt="Logo Yuni" width="80" height="auto">
+                <span>Yuni</span>
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav>
+                <ul>
+                    <li><a href="#features">Fonctionnalités</a></li>
+                    <li><a href="#how-it-works">Comment ça marche</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content glass">
+                <div class="hero-text">
+                    <h1 class="app-title">Yuni</h1>
+                    <h2 class="hero-subtitle">Le meilleur moyen d'échanger ses photos !</h2>
+                    <p>
+                        Une application iOS ou Android pour créer des albums collaboratifs, transférer tes médias et récupérer ceux de tes potes en un clin d'œil.<br>
+                        Innovant, hyper simple et sans perte de qualité !
+                    </p>
+                    <p class="beta-announcement" style="margin-top: 20px; font-weight: 700; font-size: 1.25rem; color: var(--secondary); background-color: rgba(123, 44, 191, 0.1); padding: 12px; border-radius: 10px; display: inline-block; max-width: 100%; box-sizing: border-box; text-align: center; width: auto;">
+                        La version bêta arrive bientôt. Sois le premier informé !
+                    </p>
+                    
+                    <form id="email-form" class="email-signup hero-email">
+                        <input type="email" id="email" placeholder="Entrez votre email" required>
+                        <button type="submit" class="btn">S'inscrire</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 1 -->
+    <section class="content-section" id="section1">
+        <div class="container">
+            <div class="content-box">
+                <div class="content-image">
+                    <img src="images/partagez instantanément.jpg" alt="Facilité d'échange">
+                </div>
+                <div class="content-text">
+                    <h2 class="content-title">Facilite tes échanges !</h2>
+                    <h3 style="color: var(--secondary); margin-bottom: 15px; font-size: 1.5rem;">Fini les problèmes de transfert</h3>
+                    <p>Envoyer des photos à plusieurs potes, c'est souvent le chaos : fichiers compressés, manque de stockage, envois éparpillés, des dizaines de doublons… Avec YUNI, dépose tes photos et vidéos dans un album partagé et laisse tes potes récupérer ce qu'ils veulent, sans perte de qualité. Simple, rapide, efficace.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2 -->
+    <section class="content-section" id="section2">
+        <div class="container">
+            <div class="content-box reverse">
+                <div class="content-image">
+                    <img src="images/doublons.png" alt="Albums collaboratifs">
+                </div>
+                <div class="content-text">
+                    <h2 class="content-title">Récupère uniquement ce qui compte</h2>
+                    <h3 style="color: var(--secondary); margin-bottom: 15px; font-size: 1.5rem;">Fini les doublons !</h3>
+                    <p>Toutes les photos sont ajoutées à l'album partagé, mais c'est toi qui choisis lesquelles enregistrer sur ton téléphone. Plus besoin de trier ou de supprimer après coup : télécharge uniquement tes meilleurs souvenirs. Filtrage intelligent : mets en avant les médias déjà téléchargés et évite les doublons.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3 -->
+    <section class="content-section" id="section3">
+        <div class="container">
+            <div class="content-box">
+                <div class="content-image">
+                    <img src="images/confidentialité.jpg" alt="Sécurité et confidentialité">
+                </div>
+                <div class="content-text">
+                    <h2 class="content-title">Confidentialité</h2>
+                    <h3 style="color: var(--secondary); margin-bottom: 15px; font-size: 1.5rem;">Un partage éphémère et sécurisé</h3>
+                    <p>Aucun stockage permanent, aucun fichier imposé. Chaque album est un espace temporaire conçu pour échanger et récupérer tes médias en toute tranquillité. Une fois son rôle terminé, il s'efface automatiquement, assurant une confidentialité totale.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+        <div class="container">
+            <h2 class="section-title">Fonctionnalités uniques</h2>
+            <div class="features-container">
+                <div class="feature-card glass">
+                    <div class="feature-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                        <h3>Albums partagés</h3>
+                        <p>Crée des albums collaboratifs pour organiser et transférer tes médias entre amis.</p>
+                </div>
+                <div class="feature-card glass">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Universel et fluide</h3>
+                    <p>Compatible iOS et Android, pour un échange simple et rapide.</p>
+                </div>
+                <div class="feature-card glass">
+                    <div class="feature-icon">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <h3>Filtrage avancé</h3>
+                    <p>Retrouve facilement tes médias grâce à des filtres intelligents dans tes albums partagés.</p>
+                </div>
+                <div class="feature-card glass">
+                    <div class="feature-icon">
+                        <i class="fas fa-compress-arrows-alt"></i>
+                    </div>
+                    <h3>Qualité HD</h3>
+                    <p>Partage tes photos et vidéos sans compression pour une qualité optimale.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works Section - CORRIGÉ -->
+    <section id="how-it-works" class="how-it-works-section">
+        <div class="container">
+            <h2 class="section-title">Comment ça marche</h2>
+            <div class="glass how-it-works-box" style="padding: 40px 20px;">
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number" style="background-color: white !important; color: #7b2cbf !important; border: 2px solid #7b2cbf !important;">1</div>
+                        <h3>Inscription</h3>
+                        <p>Crée ton compte en 1 clic et accède à tes albums partagés.</p>
+                        <div class="step-image">
+                            <img src="images/inscription.png" alt="Inscription" width="100%" height="auto">
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number" style="background-color: white !important; color: #7b2cbf !important; border: 2px solid #7b2cbf !important;">2</div>
+                        <h3>Créer un album</h3>
+                        <p>Crée un album partagé et invite tes amis en un clic.</p>
+                        <div class="step-image">
+                            <img src="images/créer un album.png" alt="Création d'album" width="100%" height="auto">
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number" style="background-color: white !important; color: #7b2cbf !important; border: 2px solid #7b2cbf !important;">3</div>
+                        <h3>Transfère tes photos</h3>
+                        <p>Ajoute tes médias sans perte de qualité.</p>
+                        <div class="step-image">
+                            <img src="images/transfère tes photos.png" alt="Transfert de photos" width="100%" height="auto">
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number" style="background-color: white !important; color: #7b2cbf !important; border: 2px solid #7b2cbf !important;">4</div>
+                        <h3>Et télécharge...</h3>
+                        <p>Les photos et vidéos partagées par tes potes.</p>
+                        <div class="step-image">
+                            <img src="images/récupère celles de tes potes.png" alt="Récupération de médias" width="100%" height="auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section id="cta" class="cta">
+        <div class="container">
+            <h2>Le partage de photos réinventé, ça te tente ?</h2>
+            <p>Encore un peu de patience. Sois parmi les premiers à tester Yuni dès sa sortie.</p>
+            <p style="font-weight: 700; font-size: 1.25rem; color: white; padding: 12px; text-align: center; margin: 15px auto 25px; max-width: 80%;">Inscris-toi et reçois la version bêta !</p>
+            <form id="email-form-cta" class="email-signup">
+                <input type="email" name="email" placeholder="Entrez votre email" required>
+                <button type="submit" class="btn">S'inscrire</button>
+            </form>
+            <div id="submission-message" style="margin-top: 15px; text-align: center; color: white; font-weight: 500; display: none;"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/logo poc.png" alt="Logo Yuni" width="60" height="auto">
+                    Yuni
+                </div>
+                <ul class="footer-links">
+                    <!-- Liens supprimés -->
+                </ul>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2025 Yuni. Tous droits réservés.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script Firebase -->
+    <!-- Correction du script Firebase -->
+<script type="module">
+    // Importer Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+    // Configuration Firebase
+    const firebaseConfig = {
+    apiKey: "AIzaSyAenvMMuUlL4NYZ2aEWfu2aXBIPYAwvGvg",
+    authDomain: "landing-page-email-v2.firebaseapp.com",
+    databaseURL: "https://landing-page-email-v2-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "landing-page-email-v2",
+    storageBucket: "landing-page-email-v2.firebasestorage.app",
+    messagingSenderId: "144362787971",
+    appId: "1:144362787971:web:d7939aa59e7b95520cb7b6"
+};
+
+// Initialiser Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+console.log("✅ Firebase initialisé :", app);
+    
+    // Soumettre un email à Firebase
+    document.addEventListener("DOMContentLoaded", function () {
+        // Gérer le formulaire principal
+        const mainForm = document.getElementById("email-form");
+        if (mainForm) {
+            mainForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                
+                let email = document.getElementById("email").value.trim();
+                if (!email) {
+                    alert("Veuillez entrer un email valide.");
+                    return;
+                }
+                
+                push(ref(db, "emails"), { 
+                    email: email, 
+                    date: new Date().toISOString(),
+                    source: "hero_section"
+                })
+                .then(() => {
+                    console.log("✅ Email enregistré :", email);
+                    document.getElementById("thank-you-popup").style.display = "flex";
+                    document.getElementById("email").value = "";
+                })
+                .catch((error) => {
+                    console.error("❌ Erreur Firebase :", error);
+                    alert("Une erreur est survenue. Veuillez réessayer.");
+                });
+            });
+        }
+        
+        // Gérer le formulaire CTA
+        const ctaForm = document.getElementById("email-form-cta");
+        if (ctaForm) {
+            ctaForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                
+                let email = this.querySelector("input[name='email']").value.trim();
+                if (!email) {
+                    alert("Veuillez entrer un email valide.");
+                    return;
+                }
+                
+                push(ref(db, "emails"), { 
+                    email: email, 
+                    date: new Date().toISOString(),
+                    source: "cta_section"
+                })
+                .then(() => {
+                    console.log("✅ Email enregistré :", email);
+                    document.getElementById("thank-you-popup").style.display = "flex";
+                    this.querySelector("input[name='email']").value = "";
+                })
+                .catch((error) => {
+                    console.error("❌ Erreur Firebase :", error);
+                    alert("Une erreur est survenue. Veuillez réessayer.");
+                });
+            });
+        }
+        
+        // Gestion du popup
+        document.querySelector(".close-popup").addEventListener("click", function() {
+            document.getElementById("thank-you-popup").style.display = "none";
+        });
+        
+        window.addEventListener("click", function(event) {
+            const popup = document.getElementById("thank-you-popup");
+            if (event.target === popup) {
+                popup.style.display = "none";
+            }
+        });
+    });
