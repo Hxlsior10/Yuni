@@ -904,6 +904,150 @@
                 padding-bottom: 250px; /* Augmenter l'espace pour le footer sur mobile */
             }
         }
+           /* Section du formulaire Google */
+    .form-section {
+        padding: 60px 0;
+        margin-top: 20px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .form-content {
+        background: var(--glass-bg);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid var(--glass-border);
+        border-radius: 15px;
+        box-shadow: var(--glass-shadow);
+        padding: 40px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .form-content:hover {
+        box-shadow: 0 10px 40px 0 rgba(36, 0, 70, 0.45);
+    }
+    
+    .form-title {
+        font-size: 2.5rem;
+        color: var(--dark);
+        margin-bottom: 20px;
+        font-weight: 700;
+        text-shadow: 1px 1px 3px rgba(36, 0, 70, 0.2);
+    }
+    
+    .form-subtitle {
+        font-size: 1.5rem;
+        color: var(--secondary);
+        margin-bottom: 25px;
+        font-weight: 600;
+    }
+    
+    .form-description {
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin: 0 auto 30px;
+        line-height: 1.6;
+        color: #444;
+    }
+    
+    .form-container {
+        max-width: 700px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(36, 0, 70, 0.2);
+        position: relative;
+    }
+    
+    .form-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    
+    .form-container iframe {
+        width: 100%;
+        border: none;
+        transition: height 0.3s ease;
+    }
+
+    /* Responsive pour tablettes */
+    @media (max-width: 768px) {
+        .form-title {
+            font-size: 2rem;
+        }
+        
+        .form-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .form-section {
+            padding: 40px 0;
+        }
+        
+        .form-content {
+            padding: 30px 20px;
+        }
+        
+        .form-container {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        
+        .form-container iframe {
+            height: 600px !important;
+            width: 1px;
+            min-width: 100%;
+        }
+    }
+
+    /* Responsive pour mobiles */
+    @media (max-width: 576px) {
+        .form-title {
+            font-size: 1.6rem;
+        }
+        
+        .form-subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .form-description {
+            font-size: 1rem;
+        }
+        
+        .form-section {
+            padding: 30px 0;
+        }
+        
+        .form-content {
+            padding: 20px 15px;
+            border-radius: 10px;
+        }
+        
+        .form-container {
+            margin: 0 -5px;
+            width: calc(100% + 10px);
+            border-radius: 6px;
+        }
+        
+        .form-container iframe {
+            height: 680px !important;
+            -webkit-overflow-scrolling: touch;
+            overflow-y: auto;
+        }
+    }
     </style>
 </head>
 <body>
@@ -964,7 +1108,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <img src="images/logo poc.png" alt="Logo Yuni" width="60" height="auto">
+                    <img src="images/logoyuni.png" alt="Logo Yuni" width="60" height="auto">
                     Yuni
                 </div>
                 <ul class="footer-links">
@@ -1219,21 +1363,19 @@ console.log("✅ Firebase initialisé :", app);
         </div>
     </section>
 
-<!-- Section Question (formulaire intégré) -->
-<section id="contact" class="content-section">
+    <!-- HTML du formulaire -->
+<section id="contact-form" class="form-section">
     <div class="container">
-        <div class="glass" style="padding: 30px; margin-top: 50px; text-align: center;">
-            <h2 style="color: var(--dark); font-size: 2rem; margin-bottom: 15px;">Aidez-nous à nous améliorer !</h2>
-            <p style="margin-bottom: 25px;">Envoyez-nous votre question ou remarque via le formulaire ci-dessous.</p>
-            <p style="margin-bottom: 25px;">Nous y répondrons sur nos réseaux sociaux.</p>
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScBjFH3soNkb4qbHfETo7k25UHRd2WFBAxI2gZOSgR-eLLIYQ/viewform?embedded=true" 
-            width="640" 
-            height="419" 
-            frameborder="0" 
-            marginheight="0" 
-            marginwidth="0">
-        </iframe>
-            </iframe>
+        <div class="form-content">
+            <h2 class="form-title">Des questions ?</h2>
+            <h3 class="form-subtitle">Nous sommes là pour vous répondre</h3>
+            <p class="form-description">
+                Utilisez le formulaire ci-dessous pour nous contacter. Notre équipe vous répondra dans les plus brefs délais.
+            </p>
+            
+            <div class="form-container">
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScBjFH3soNkb4qbHfETo7k25UHRd2WFBAxI2gZOSgR-eLLIYQ/viewform?embedded=true&viewform?hl=fr&usp=no_redirect" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0">Chargement...</iframe>
+            </div>
         </div>
     </div>
 </section>
@@ -1251,3 +1393,35 @@ console.log("✅ Firebase initialisé :", app);
             <div id="submission-message" style="margin-top: 15px; text-align: center; color: white; font-weight: 500; display: none;"></div>
         </div>
     </section>
+    
+    <!-- JavaScript pour l'adaptation mobile -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Détecter le mobile pour ajuster la hauteur de l'iframe
+        function adjustFormHeight() {
+            const formIframe = document.querySelector('.form-container iframe');
+            if (!formIframe) return;
+            
+            // Ajuster la hauteur en fonction de la taille de l'écran
+            if (window.innerWidth <= 576) {
+                formIframe.style.height = '680px';
+            } else if (window.innerWidth <= 768) {
+                formIframe.style.height = '600px';
+            } else {
+                formIframe.style.height = '500px';
+            }
+        }
+        
+        // Ajuster au chargement et redimensionnement
+        adjustFormHeight();
+        window.addEventListener('resize', adjustFormHeight);
+        
+        // Ajouter un gestionnaire pour les problèmes de défilement sur mobile
+        const formContainer = document.querySelector('.form-container');
+        if (formContainer && 'ontouchstart' in window) {
+            formContainer.addEventListener('touchstart', function(e) {
+                e.stopPropagation();
+            }, { passive: true });
+        }
+    });
+</script>
