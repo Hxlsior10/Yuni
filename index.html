@@ -906,16 +906,16 @@
         }
            /* Section du formulaire Google */
     .form-section {
-        padding: 60px 0;
+        padding: 30px 0;
         margin-top: 20px;
         position: relative;
         z-index: 1;
     }
     
     .container {
-        max-width: 1200px;
+        max-width: 1000px;
         margin: 0 auto;
-        padding: 0 20px;
+        padding: 0 10px;
     }
     
     .form-content {
@@ -935,7 +935,7 @@
     }
     
     .form-title {
-        font-size: 2.5rem;
+        font-size: 2 rem;
         color: var(--dark);
         margin-bottom: 20px;
         font-weight: 700;
@@ -943,7 +943,7 @@
     }
     
     .form-subtitle {
-        font-size: 1.5rem;
+        font-size: 1 rem;
         color: var(--secondary);
         margin-bottom: 25px;
         font-weight: 600;
@@ -1043,7 +1043,7 @@
         }
         
         .form-container iframe {
-            height: 680px !important;
+            height: 400px !important;
             -webkit-overflow-scrolling: touch;
             overflow-y: auto;
         }
@@ -1367,11 +1367,9 @@ console.log("✅ Firebase initialisé :", app);
 <section id="contact-form" class="form-section">
     <div class="container">
         <div class="form-content">
-            <h2 class="form-title">Des questions ?</h2>
-            <h3 class="form-subtitle">Nous sommes là pour vous répondre</h3>
+            <h2 class="form-title">Aidez-nous à nous améliorer !</h2>
+            <h3 class="form-subtitle">Des questions, des remarques, n'hésitez pas.</h3>
             <p class="form-description">
-                Utilisez le formulaire ci-dessous pour nous contacter. Notre équipe vous répondra dans les plus brefs délais.
-            </p>
             
             <div class="form-container">
                 <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScBjFH3soNkb4qbHfETo7k25UHRd2WFBAxI2gZOSgR-eLLIYQ/viewform?embedded=true&viewform?hl=fr&usp=no_redirect" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0">Chargement...</iframe>
@@ -1393,7 +1391,7 @@ console.log("✅ Firebase initialisé :", app);
             <div id="submission-message" style="margin-top: 15px; text-align: center; color: white; font-weight: 500; display: none;"></div>
         </div>
     </section>
-    
+
     <!-- JavaScript pour l'adaptation mobile -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -1404,11 +1402,11 @@ console.log("✅ Firebase initialisé :", app);
             
             // Ajuster la hauteur en fonction de la taille de l'écran
             if (window.innerWidth <= 576) {
-                formIframe.style.height = '680px';
-            } else if (window.innerWidth <= 768) {
                 formIframe.style.height = '600px';
-            } else {
+            } else if (window.innerWidth <= 768) {
                 formIframe.style.height = '500px';
+            } else {
+                formIframe.style.height = '400px';
             }
         }
         
