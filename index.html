@@ -904,84 +904,7 @@
                 padding-bottom: 250px; /* Augmenter l'espace pour le footer sur mobile */
             }
         }
-           /* Section du formulaire Google */
-    .form-section {
-        padding: 30px 0;
-        margin-top: 20px;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .container {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 0 10px;
-    }
-    
-    .form-content {
-        background: var(--glass-bg);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid var(--glass-border);
-        border-radius: 15px;
-        box-shadow: var(--glass-shadow);
-        padding: 40px;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-    
-    .form-content:hover {
-        box-shadow: 0 10px 40px 0 rgba(36, 0, 70, 0.45);
-    }
-    
-    .form-title {
-        font-size: 2 rem;
-        color: var(--dark);
-        margin-bottom: 20px;
-        font-weight: 700;
-        text-shadow: 1px 1px 3px rgba(36, 0, 70, 0.2);
-    }
-    
-    .form-subtitle {
-        font-size: 1 rem;
-        color: var(--secondary);
-        margin-bottom: 25px;
-        font-weight: 600;
-    }
-    
-    .form-description {
-        font-size: 1.1rem;
-        max-width: 700px;
-        margin: 0 auto 30px;
-        line-height: 1.6;
-        color: #444;
-    }
-    
-    .form-container {
-        max-width: 700px;
-        margin: 0 auto;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(36, 0, 70, 0.2);
-        position: relative;
-    }
-    
-    .form-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, var(--primary), var(--secondary));
-    }
-    
-    .form-container iframe {
-        width: 100%;
-        border: none;
-        transition: height 0.3s ease;
-    }
+       
 
     /* Responsive pour tablettes */
     @media (max-width: 768px) {
@@ -1362,21 +1285,6 @@ console.log("✅ Firebase initialisé :", app);
             </div>
         </div>
     </section>
-
-    <!-- HTML du formulaire -->
-<section id="contact-form" class="form-section">
-    <div class="container">
-        <div class="form-content">
-            <h2 class="form-title">Aidez-nous à nous améliorer !</h2>
-            <h3 class="form-subtitle">Des questions, des remarques, n'hésitez pas.</h3>
-            <p class="form-description">
-            
-            <div class="form-container">
-                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScBjFH3soNkb4qbHfETo7k25UHRd2WFBAxI2gZOSgR-eLLIYQ/viewform?embedded=true&viewform?hl=fr&usp=no_redirect" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0">Chargement...</iframe>
-            </div>
-        </div>
-    </div>
-</section>
 
     <!-- Call to Action Section -->
     <section id="cta" class="cta">
